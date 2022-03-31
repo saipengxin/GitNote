@@ -23,7 +23,7 @@
 
 ​		例如，我们要建立一个golang的学习笔记仓库，并同时推送到GitHub和Gitee
 
-- 首先，我们要在本地生成SSH密钥，并配置倒GitHub、Gitee
+- 首先，我们要在本地生成SSH密钥，并配置到GitHub、Gitee
 
 ​		我们可以使用如下命令生成SSH密钥：
 
@@ -39,8 +39,68 @@ $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 >
 > Gitee : 右上角头像 -> 设置 -> SSH 公钥
 
-
+> 我在这里也碰到了一个问题，起因是我使用的是公司电脑，公司的代码也是存储在阿里云的托管平台的，所以事先就在本机上已经生成了ssh key，生成方式是：
+>
+> > ssh-keygen -t rsa -C "saipengxin@163.com"
+>
+> 但是将这个ssh key 配置在github后，克隆仓库的时候报错：
+>
+> >  You’re using an RSA key with SHA-1, which is no longer allowed. Please use a newer client or a different key type.
+> > Please see https://github.blog/2021-09-01-improving-git-protocol-security-github/ for more information.
+>
+> 后来使用了github文档中提供的第二种方式进行生成就可以了。（就是上面两个命令中的第二个）
 
 - 然后，在两个平台都建立代码存储仓库
 
   ![image-20220330233254061](assets/image-20220330233254061.png)
+
+- 我们在本地使用git clone 命令将github的仓库个克隆下来。
+
+  跟着一起下来的，不只有代码仓库，还有一个隐藏文件夹 .git ,Linux和Mac使用 `ls -n` 查看，Windows点击上面导航栏中的`查看-隐藏的项目`勾选上。
+
+
+
+- .git 中有一个config文件，我们要对这个文件进行改动
+
+```
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+    # github 仓库地址 这行代码是本来就有的 指向github仓库
+	url = git@github.com:saipengxin/GitNode.git
+	# 新增 gitee 仓库地址 这行代码是新增的，指向gitee仓库地址
+	url = git@gitee.com:saipengxin/git-node.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main
+```
+
+- 改动完成后，我们可以使用 `git remote -v` 命令来看当前仓库关联的远程仓库地址
+
+![image-20220331100155456](assets/image-20220331100155456.png)
+
+- 测试一下
+
+![image-20220331100259776](assets/image-20220331100259776.png)
+
+![image-20220331100420321](assets/image-20220331100420321.png)
+
+![image-20220331100814191](assets/image-20220331100814191.png)
+
+
+
+## 总结
+
+​		其实写下这篇文章的时候，已经是将这套流程鼓捣完了并且有过简单的使用了。说实话，感觉并没有想象中那么好，主要有以下几个原因：
+
+- 每次写完笔记都需要推拉，操作不是很便捷。
+- 每在一个新设备上拉取git仓库后，都需要手动改一下`.git/config`文件中的内容，否则只会指向一个仓库地址。
+- 移动端不是特别的友好
+
+​		不过想来想去还是决定使用这种模式继续记录笔记和内容，一来是想将内容发出去大家都可以看见，这样就能一起学习进步，同时期待着自己遥遥无期的100star仓库，另外就是想，新公司，新环境换个新的心情吧。
